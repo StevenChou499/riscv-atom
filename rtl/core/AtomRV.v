@@ -57,9 +57,9 @@ module AtomRV
         transaction takes place. GHPI protocol also supports delayed transactions.
 
         CPU has two GHPI ports namely imem & dmem ports. imem port is used only for reading 
-        the memory while dmem pot is used for both eads and writes. The CPU ca ne configured in 
+        the memory while dmem port is used for both reads and writes. The CPU can be configured in 
         both Harvard and Von-Neumann fashion. In case of Harvard configuration, separate instruction 
-        and data memory ae needed to be connected. In case of Von-Neumann mode, a bus arbiter is
+        and data memory are needed to be connected. In case of Von-Neumann mode, a bus arbiter is
         needed to multiplex between both ports.
 
         Reads:
@@ -91,7 +91,7 @@ module AtomRV
 
     /*
         Definition of stall:
-        Stall is a state of a pipeline stage in which the current instuction cannot popogate forward.
+        Stall is a state of a pipeline stage in which the current instuction cannot propogate forward.
 
         Definition of flush:
         Flush is defined as insertion of nop in the pipeline in order to prevent an unwanted instuction 
