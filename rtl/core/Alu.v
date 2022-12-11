@@ -22,22 +22,118 @@ module Alu
 (
     input   wire    [31:0]  a_i,
     input   wire    [31:0]  b_i,
-    input   wire    [2:0]   sel_i,
+    input   wire    [3:0]   sel_i,
 
     output  reg     [31:0]  result_o
 );
 
-    wire sel_add = (sel_i == `ALU_FUNC_ADD);
-    wire sel_sub = (sel_i == `ALU_FUNC_SUB);
-    wire sel_xor = (sel_i == `ALU_FUNC_XOR);
-    wire sel_or  = (sel_i == `ALU_FUNC_OR);
-    wire sel_and = (sel_i == `ALU_FUNC_AND);
-    wire sel_sll = (sel_i == `ALU_FUNC_SLL);
-    wire sel_srl = (sel_i == `ALU_FUNC_SRL);
-    wire sel_sra = (sel_i == `ALU_FUNC_SRA);
+    wire sel_add    = (sel_i == `ALU_FUNC_ADD);
+    wire sel_sub    = (sel_i == `ALU_FUNC_SUB);
+    wire sel_xor    = (sel_i == `ALU_FUNC_XOR);
+    wire sel_or     = (sel_i == `ALU_FUNC_OR);
+    wire sel_and    = (sel_i == `ALU_FUNC_AND);
+    wire sel_sll    = (sel_i == `ALU_FUNC_SLL);
+    wire sel_srl    = (sel_i == `ALU_FUNC_SRL);
+    wire sel_sra    = (sel_i == `ALU_FUNC_SRA);
+    wire sel_mul    = (sel_i == `ALU_FUNC_MUL);
+    wire sel_mulh   = (sel_i == `ALU_FUNC_MULH);
+    wire sel_mulhu  = (sel_i == `ALU_FUNC_MULHU);
+    wire sel_mulhsu = (sel_i == `ALU_FUNC_MULHSU);
+    wire sel_div    = (sel_i == `ALU_FUNC_DIV);
+    wire sel_divu   = (sel_i == `ALU_FUNC_DIVU);
+    wire sel_rem    = (sel_i == `ALU_FUNC_REM);
+    wire sel_remu   = (sel_i == `ALU_FUNC_REMU);
 
     // Result of arithmetic calculations (ADD/SUB)
     wire [31:0] arith_result = a_i + (sel_sub ? ((~b_i)+1) : b_i);
+
+    // Extend a_i and b_i to 64-bits long for multiplication
+    reg [63:0] extend_a_i;
+    reg [63:0] extend_b_i;
+    
+    always @(*) begin
+        if (sel_mul | sel_mulh) begin
+            extend_a_i[63:0]  = {{32{a_i[31]}}, a_i};
+            extend_b_i[63:0]  = {{32{b_i[31]}}, b_i};
+        end
+        else if (sel_mulhu) begin
+            extend_a_i[63:0]  = {32'd0, a_i};
+            extend_b_i[63:0]  = {32'd0, b_i};
+        end
+        else begin // if (sel_mulhsu)
+            extend_a_i[63:0]  = {{32{a_i[31]}}, a_i};
+            extend_b_i[63:0]  = {32'd0, b_i};
+        end
+    end
+
+    wire [63:0] full_mul_result = extend_a_i * extend_b_i;
+    reg [31:0] final_mul_result;
+
+    // wire [63:0] full_div_result = extend_a_i / extend_b_i;
+    // wire [63:0] full_rem_result = extend_a_i % extend_b_i;
+    // reg [31:0] final_div_result;
+    // reg [31:0] final_rem_result;
+
+    always @(*) begin
+        if (sel_mul) begin
+            final_mul_result[31:0] = full_mul_result[31:0];
+            // final_div_result[31:0] = full_div_result[31:0];
+            // final_rem_result[31:0] = full_rem_result[31:0];
+        end
+        else begin // sel_mulh, sel_mulhu, sel_mulhsu
+            final_mul_result[31:0] = full_mul_result[63:32];
+            // final_div_result[31:0] = full_div_result[63:32];
+            // final_rem_result[31:0] = full_rem_result[63:32];
+        end
+    end
+
+    wire sign_a = a_i[31];
+    wire sign_b = b_i[31];
+
+    reg [31:0] tmp_div_a;
+    reg [31:0] tmp_div_b;
+
+    always @(*) begin
+        if (sign_a & (sel_div | sel_rem)) begin
+            tmp_div_a[31:0] = ~{a_i} + 32'd1;
+            tmp_div_b[31:0] = b_i;
+        end
+        else if (sign_b & (sel_div | sel_rem)) begin
+            tmp_div_a[31:0] = a_i;
+            tmp_div_b[31:0] = ~{b_i} + 32'd1;
+        end
+        else begin
+            tmp_div_a[31:0] = a_i;
+            tmp_div_b[31:0] = b_i;
+        end
+    end
+
+    wire [31:0] sign_div_result = tmp_div_a / tmp_div_b;
+    wire [31:0] sign_rem_result = tmp_div_a % tmp_div_b;
+
+    reg [31:0] final_div_result;
+    reg [31:0] final_rem_result;
+
+    always @(*) begin
+        if (b_i == 32'd0) begin
+            final_div_result = -32'd1;
+            final_rem_result = a_i;
+        end
+        else if (a_i == (32'd1 << 31) && b_i == -32'd1 && (sel_div || sel_rem)) begin
+            final_div_result = (32'd1 << 31);
+            final_rem_result = 32'd0;
+        end
+        else begin
+            final_div_result = tmp_div_a / tmp_div_b;
+            final_rem_result = tmp_div_a % tmp_div_b;
+            if ((sign_a ^ sign_b) & (sel_div)) begin
+                final_div_result = ~{sign_div_result} + 32'd1;
+            end
+            if (sign_a & (sel_rem)) begin
+                final_rem_result = ~{sign_rem_result} + 32'd1;
+            end
+        end
+    end
 
     // Bitreverse
     function [31:0] reverse;
@@ -87,6 +183,12 @@ module Alu
             result_o = a_i | b_i;
         else if (sel_and)
             result_o = a_i & b_i;
+        else if (sel_mul | sel_mulh | sel_mulhu | sel_mulhsu)
+            result_o = final_mul_result;
+        else if (sel_div | sel_divu)
+            result_o = final_div_result;
+        else if (sel_rem | sel_remu)
+            result_o = final_rem_result;
         else
             result_o = arith_result;
     end        
