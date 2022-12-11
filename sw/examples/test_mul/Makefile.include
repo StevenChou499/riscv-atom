@@ -1,0 +1,2 @@
+src_files = test_mul.c
+executable = test_mul.elf
