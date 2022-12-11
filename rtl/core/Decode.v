@@ -24,7 +24,7 @@ module Decode
     output  reg             a_op_sel_o,
     output  reg             b_op_sel_o,
     output  reg             cmp_b_op_sel_o,
-    output  reg     [2:0]   alu_op_sel_o,
+    output  reg     [3:0]   alu_op_sel_o,
     output  wire    [2:0]   mem_access_width_o,
     output  reg             d_mem_load_store,
     output  reg             mem_we_o,
@@ -419,6 +419,86 @@ module Decode
                 a_op_sel_o = 1'b0;
                 b_op_sel_o = 1'b0;
                 alu_op_sel_o = `ALU_FUNC_AND;
+            end
+
+            /* MUL   */ 
+            17'b0000001_000_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_MUL;
+            end
+
+            /* MULH  */ 
+            17'b0000001_001_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_MULH;
+            end
+
+            /* MULHU */ 
+            17'b0000001_011_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_MULHU;
+            end
+
+            /* MULHSU */ 
+            17'b0000001_010_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_MULHSU;
+            end
+
+            /* DIV   */ 
+            17'b0000001_100_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_DIV;
+            end
+
+            /* DIVU  */ 
+            17'b0000001_101_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_DIVU;
+            end
+
+            /* REM   */ 
+            17'b0000001_110_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_REM;
+            end
+
+            /* REMU  */ 
+            17'b0000001_111_0110011: 
+            begin
+                rf_we_o = 1'b1;
+                rf_din_sel_o = 3'd2;
+                a_op_sel_o = 1'b0;
+                b_op_sel_o = 1'b0;
+                alu_op_sel_o = `ALU_FUNC_REMU;
             end
 
             /////////////////////////////////////////////////////////////////////////
