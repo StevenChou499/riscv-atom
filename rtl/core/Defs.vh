@@ -38,6 +38,8 @@
 `define ALU_FUNC_SLL    4'd5
 `define ALU_FUNC_SRL    4'd6
 `define ALU_FUNC_SRA    4'd7
+
+// Support RV32M Instructions
 `define ALU_FUNC_MUL    4'd8
 `define ALU_FUNC_MULH   4'd9
 `define ALU_FUNC_MULHU  4'd10
