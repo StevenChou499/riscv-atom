@@ -91,7 +91,7 @@ module AtomRV
 
     /*
         Definition of stall:
-        Stall is a state of a pipeline stage in which the current instuction cannot propogate forward.
+        Stall is a state of a pipeline stage in which the current instruction cannot propogate forward.
 
         Definition of flush:
         Flush is defined as insertion of nop in the pipeline in order to prevent an unwanted instuction 
@@ -107,7 +107,7 @@ module AtomRV
     /*
         Stall Stage1 in case:
             - Stage1 is waiting for response of a memory request that is has made.
-            - Stage2 is stalled, since the instruction in stage1 cant popogate to stage2. Therefore until
+            - Stage2 is stalled, since the instruction in stage1 cant propogate to stage2. Therefore until
             the stage2 is stalled, instruction in stage1 is kept held.
     */
     wire waiting_for_ibus_response = (!imem_handshake && imem_valid_o);
@@ -116,9 +116,8 @@ module AtomRV
     /*
         Flush pipeline (insert nop in s2) in case:
             - there is a jump
-            - Stage1 is stalled and stage is not, in this case stage can't recieve an new instruction to 
-            execute therefore a bubble is introduced. 
-            - 
+            - Stage1 is stalled and stage2 is not, in this case stage2 can't recieve an new instruction to 
+            execute therefore a bubble is introduced.
     */
     wire flush_pipeline = jump_decision || (stall_stage2 ? 0 : stall_stage1);
 
