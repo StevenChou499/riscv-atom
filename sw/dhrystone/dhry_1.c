@@ -19,7 +19,7 @@
 #include <string.h>
 
   #ifndef DHRY_ITERS
-  #define DHRY_ITERS 1000
+  #define DHRY_ITERS 2000
   #endif
 
 /* Global Variables: */
@@ -49,6 +49,8 @@ Enumeration     Func_1 ();
 /* variables for time measurement: */
 
 #ifdef TIMES
+#undef HZ
+#define HZ      (20 * 1000 * 1000)  // 20MHz
 struct tms      time_info;
 extern  int     times ();
                 /* see library function "times" */
@@ -75,7 +77,7 @@ float           Microseconds,
 /* end of variables for time measurement */
 
 
-main ()
+int main ()
 /*****/
 
   /* main program, corresponds to procedures        */
@@ -267,6 +269,8 @@ main ()
   printf ("\n");
 
   User_Time = End_Time - Begin_Time;
+
+  printf("The User_Time is %d\n", User_Time);
 
   if (User_Time < Too_Small_Time)
   {
