@@ -69,21 +69,12 @@ module Alu
     wire [63:0] full_mul_result = extend_a_i * extend_b_i;
     reg [31:0] final_mul_result;
 
-    // wire [63:0] full_div_result = extend_a_i / extend_b_i;
-    // wire [63:0] full_rem_result = extend_a_i % extend_b_i;
-    // reg [31:0] final_div_result;
-    // reg [31:0] final_rem_result;
-
     always @(*) begin
         if (sel_mul) begin
             final_mul_result[31:0] = full_mul_result[31:0];
-            // final_div_result[31:0] = full_div_result[31:0];
-            // final_rem_result[31:0] = full_rem_result[31:0];
         end
         else begin // sel_mulh, sel_mulhu, sel_mulhsu
             final_mul_result[31:0] = full_mul_result[63:32];
-            // final_div_result[31:0] = full_div_result[63:32];
-            // final_rem_result[31:0] = full_rem_result[63:32];
         end
     end
 
