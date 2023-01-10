@@ -502,6 +502,19 @@ module Decode
             end
 
             /////////////////////////////////////////////////////////////////////////
+            /* Fence Instruction */
+            // 0000111 1111100000 000 00000 0001111
+            // 17'b0000111_000_0001111:
+            // begin
+            //     rf_we_o = 1'b1;
+            //     rf_din_sel_o = 3'd2;
+            //     a_op_sel_o = 1'b0;
+            //     b_op_sel_o = 1'b1;
+            //     alu_op_sel_o = `ALU_FUNC_ADD;
+            //     imm_format = `RV_IMM_TYPE_I;
+            // end
+
+            /////////////////////////////////////////////////////////////////////////
 
             /* CSR Instructions */
             17'b???????_???_1110011:begin
@@ -525,7 +538,7 @@ module Decode
                 csru_we_o = 0;
 
                 `ifdef verilator
-                    if(opcode != 7'b1110011) // EBREAK
+                    if(opcode != 7'b1110011 && opcode != 7'b0001111) // EBREAK
                         $display("!Warning: Unimplemented Opcode: %b", opcode);
                 `endif
             end            
