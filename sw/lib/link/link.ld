@@ -21,7 +21,8 @@ SECTIONS
     .text : 
     { 
         *(.boot*)
-        . = ORIGIN(ROM) + 0x100;
+        /*. = ORIGIN(ROM) + 0x100;*/
+        . = ORIGIN(ROM) + 0x000;
         
         _svector = .;
         KEEP(*(.vector*))   /* Keep all interrupt vector tables at very start of text section */
