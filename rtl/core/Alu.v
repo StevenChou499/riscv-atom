@@ -85,17 +85,13 @@ module Alu
     reg [31:0] tmp_div_b;
 
     always @(*) begin
+        tmp_div_a[31:0] = a_i;
+        tmp_div_b[31:0] = b_i;
         if (sign_a & (sel_div | sel_rem)) begin
             tmp_div_a[31:0] = ~{a_i} + 32'd1;
-            tmp_div_b[31:0] = b_i;
         end
-        else if (sign_b & (sel_div | sel_rem)) begin
-            tmp_div_a[31:0] = a_i;
+        if (sign_b & (sel_div | sel_rem)) begin
             tmp_div_b[31:0] = ~{b_i} + 32'd1;
-        end
-        else begin
-            tmp_div_a[31:0] = a_i;
-            tmp_div_b[31:0] = b_i;
         end
     end
 
